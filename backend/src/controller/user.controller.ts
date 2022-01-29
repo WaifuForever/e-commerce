@@ -1,13 +1,16 @@
 import { Request, Response } from 'express';
 
 import knex from '../database/db';
+import { IUser } from '../database/interfaces/user.interface';
 
 async function create(req: Request, res: Response) {
     try {
-        const { name } = req.body;
+        const { name, email, password }: IUser = req.body;
 
         await knex('users').insert({
             name: name,
+            email: email,
+            password: password
         });
 
         return res.status(201).json('User added!!');
