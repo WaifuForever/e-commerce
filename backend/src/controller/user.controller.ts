@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 
 import knex from '../database/db';
 import { IUser } from '../database/interfaces/user.interface';
+import { hashPassword } from '../utils/password.util';
 
 async function create(req: Request, res: Response) {
     try {
@@ -10,7 +11,7 @@ async function create(req: Request, res: Response) {
         await knex('users').insert({
             name: name,
             email: email,
-            password: password
+            password: await hashPassword(password)
         });
 
         return res.status(201).json('User added!!');

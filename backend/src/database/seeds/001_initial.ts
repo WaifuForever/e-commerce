@@ -1,12 +1,10 @@
 import { Knex } from 'knex';
 import { v4 as uuidv4 } from 'uuid';
-import * as bcrypt from 'bcrypt';
+import { hashPassword } from '../../utils/password.util';
+
 
 export async function seed(knex: Knex): Promise<void> {
-    const hashPassword = async (password: string) => {
-        return await bcrypt.hash(password, Number(process.env.HASH_SALT));
-    };
-
+  
     // prettier-ignore
     const data = [
             { _id: uuidv4(), email: 'fakeemail1@gmail.com', name: 'George0', password: await hashPassword('password@3123') },
