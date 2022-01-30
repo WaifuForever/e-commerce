@@ -1,17 +1,16 @@
 import express from 'express';
 
 import UserController from '../controllers/user.controller';
-
-//import TeamMiddleware from '../middleware/team.middleware';
+import UserMiddleware from '../middlewares/user.middleware';
 
 const router = express.Router();
 
-router.post('/', UserController.create);
-router.get('/findOne', UserController.findOne);
+router.post('/', UserMiddleware.create, UserController.create);
+router.get('/findOne', UserMiddleware.findById, UserController.findOne);
 
 router.get('/', UserController.list);
-router.put('/', UserController.update);
+router.put('/', UserMiddleware.update,  UserController.update);
 
-router.delete('/', UserController.remove);
+router.delete('/', UserMiddleware.findById, UserController.remove);
 
 export default router;
