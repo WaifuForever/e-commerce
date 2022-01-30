@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 import knex from '../database/db';
-import { IUser } from '../database/interfaces/user.interface';
+import { IUser } from '../interfaces/user.interface';
 import { getMessage } from '../utils/message.util';
 import { hashPassword } from '../utils/password.util';
 

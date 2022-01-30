@@ -1,21 +1,18 @@
 import { Knex } from 'knex';
-
-require('dotenv').config({path: `../../.env.${process.env.NODE_ENV}`});
-
 interface IKnexConfig {
     [key: string]: Knex.Config;
 }
 
 const connection = `postgres://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}:${process.env.DB_PORT}/`;
-
+console.log(connection);
 const config: IKnexConfig = {
     dev: {
         client: 'pg',
         connection: connection + `${process.env.DB_NAME}`,
         migrations: {
-            directory: './migrations',
+            directory: '../migrations',
         },
-        seeds: { directory: './seeds' },
+        seeds: { directory: '../seeds' },
         debug: true,
     },
 
@@ -23,9 +20,9 @@ const config: IKnexConfig = {
         client: 'pg',
         connection: connection + `${process.env.DB_TEST_NAME}`,
         migrations: {
-            directory: './migrations',
+            directory: '../migrations',
         },
-        seeds: { directory: './seeds' },
+        seeds: { directory: '../seeds' },
         debug: true,
     },
 
@@ -33,10 +30,10 @@ const config: IKnexConfig = {
         client: 'pg',
         connection: connection + `${process.env.DB_NAME}`,
         migrations: {
-            directory: './migrations',
+            directory: '../migrations',
         },
-        seeds: { directory: './seeds' },
+        seeds: { directory: '../seeds' },
     },
 };
 
-module.exports = config;
+export default config;
