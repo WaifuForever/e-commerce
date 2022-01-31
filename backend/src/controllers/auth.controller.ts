@@ -12,32 +12,36 @@ async function signIn(req: Request, res: Response) {
         return res.jsonUnauthorized(null, null, null);
     }
 
-    const [email, password] = Buffer.from(hash, 'base64').toString().split(':');
+    let [email, password] = Buffer.from(hash, 'base64').toString().split(':');
 
-    const user: ISignIn = await knex('users')
+    const user: Array<ISignIn> = await knex('users')
         .where({ email: email })
         .select({
             _id: '_id',
             password: 'password',
             tokenVersion: 'tokenVersion',
         });
+    if (user.length === 0) {
+        return res.jsonUnauthorized(null, null, null);
+    }
 
-    const match = matchPassword(password, user.password!);
-
+    const match = matchPassword(password, user[0].password!);
+    delete user[0].password;
+    password = '';
     if (!match) {
         return res.jsonBadRequest(null, null, null);
     } else {
         const token = jwt.generateJwt(
             {
-                _id: user._id,
-                tokenVersion: user.tokenVersion,
+                _id: user[0]._id,
+                tokenVersion: user[0].tokenVersion,
             },
             1,
         );
         const refreshToken = jwt.generateJwt(
             {
-                _id: user._id,
-                tokenVersion: user.tokenVersion,
+                _id: user[0]._id,
+                tokenVersion: user[0].tokenVersion,
             },
             2,
         );
@@ -48,8 +52,8 @@ async function signIn(req: Request, res: Response) {
             path: '/refresh-token',
         });*/
 
-        user.password = undefined;
-        return res.jsonOK(user, getMessage('user.valid.sign_in.success'), {
+        user[0].password = undefined;
+        return res.jsonOK(user[0], getMessage('user.valid.sign_in.success'), {
             token,
         });
     }

@@ -1,22 +1,35 @@
 import { Request, Response } from 'express';
+import { v4 as uuidv4 } from 'uuid';
 
 import knex from '../database/db';
-import { IUser } from '../interfaces/user.interface';
+import { IFindOne, IUser } from '../interfaces/user.interface';
 import { getMessage } from '../utils/message.util';
 import { hashPassword } from '../utils/password.util';
+
+const selection: IFindOne = {
+    _id: '_id',
+    name: 'name',
+    email: 'email',
+};
 
 async function create(req: Request, res: Response) {
     try {
         const { name, email, password }: IUser = req.body;
 
         const result = await knex('users').insert({
+            _id: uuidv4(),
             name: name,
             email: email,
             password: await hashPassword(password),
         });
 
-        return res.jsonOK(result, getMessage('user.valid.sign_up.sucess'), {});
+        return res.jsonOK(
+            { name: name, email: email },
+            getMessage('user.valid.sign_up.success'),
+            {},
+        );
     } catch (error) {
+        console.log(error);
         return res.jsonBadRequest(error, null, null);
     }
 }
@@ -24,9 +37,10 @@ async function create(req: Request, res: Response) {
 async function findOne(req: Request, res: Response) {
     const { _id } = req.query;
     try {
-        const result = await knex('users').where('_id', _id?.toString());
-
-        return res.jsonOK(result, null, {});
+        const user: Array<IFindOne> = await knex('users')
+            .where('_id', _id?.toString())
+            .select(selection);
+        return res.jsonOK(user[0], null, {});
     } catch (err) {
         console.log(err);
         return res.jsonBadRequest({ err: err }, null, null);
@@ -35,9 +49,13 @@ async function findOne(req: Request, res: Response) {
 
 async function list(req: Request, res: Response) {
     try {
-        const result = await knex('users');
+        const users: Array<IFindOne> = await knex('users').select(selection);
 
-        return res.jsonOK(result, null, {});
+        return res.jsonOK(
+            users,
+            getMessage('user.list.success') + users.length,
+            {},
+        );
     } catch (err) {
         console.log(err);
         return res.jsonBadRequest({ err: err }, null, null);

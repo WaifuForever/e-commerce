@@ -7,7 +7,7 @@ import jwt from '../utils/jwt.util';
 import { encrypt } from '../utils/password.util';
 import { getMessage } from '../utils/message.util';
 
-function auth() {
+export const auth = () => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
             const [, token] = req.headers.authorization
@@ -60,5 +60,3 @@ function auth() {
         }
     };
 }
-
-export default { auth };
