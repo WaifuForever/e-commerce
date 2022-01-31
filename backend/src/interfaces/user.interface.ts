@@ -3,3 +3,10 @@ export interface IUser {
     email: string,
     password: string
 }
+
+export interface ISignIn {
+    _id: string;
+    tokenVersion: number,
+    email: string,
+    password: string | undefined
+}
