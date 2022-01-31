@@ -7,6 +7,7 @@ import limiter from './limiter.config';
 
 import { response } from '../middlewares/response.middleware';
 
+import appRoute from '../routes/app.route';
 import authRoute from '../routes/auth.route';
 import userRoute from '../routes/user.route';
 
@@ -20,6 +21,7 @@ app.use('/files', express.static('uploads'));
 app.use(cors(corsOptionsDelegate));
 app.use(limiter); // limiting all requests
 app.use(response);
+app.use(appRoute);
 app.use('/auth', authRoute);
 app.use('/users', userRoute);
 
