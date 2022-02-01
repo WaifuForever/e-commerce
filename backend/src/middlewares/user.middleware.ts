@@ -18,7 +18,7 @@ async function create(req: Request, res: Response, next: NextFunction) {
         .catch((err: any) => {
             return res.jsonBadRequest(
                 null,
-                getMessage('badRequest'),
+                getMessage('default.badRequest'),
                 err.errors,
             );
         });
@@ -35,7 +35,7 @@ async function findById(req: Request, res: Response, next: NextFunction) {
         .catch((err: any) => {
             return res.jsonBadRequest(
                 null,
-                getMessage('badRequest'),
+                getMessage('default.badRequest'),
                 err.errors,
             );
         });
@@ -63,16 +63,44 @@ async function update(req: Request, res: Response, next: NextFunction) {
     yupObject
         .validate(req.body, { stripUnknown: true })
         .then(() => {
-            console.log(req.body)
-            next()
+            console.log(req.body);
+            next();
         })
         .catch((err: any) => {
             return res.jsonBadRequest(
                 null,
-                getMessage('badRequest'),
+                getMessage('default.badRequest'),
                 err.errors,
             );
         });
 }
 
-export default { create, findById, update };
+async function signIn(req: Request, res: Response, next: NextFunction) {
+    const [hashType, hash] = req.headers.authorization
+        ? req.headers.authorization.split(' ')
+        : [''];
+
+    if (hashType !== 'Basic') {
+        return res.jsonUnauthorized(null, null, null);
+    }
+
+    const [email, password] = Buffer.from(hash, 'base64').toString().split(':');
+
+    const yupObject = yup.object().shape({
+        email: rules.email.required(),
+        password: rules.password.required(),
+    });
+
+    yupObject
+        .validate({ email: email, password: password }, { stripUnknown: true })
+        .then(() => next())
+        .catch((err: any) => {
+            return res.jsonBadRequest(
+                null,
+                getMessage('default.badRequest'),
+                err.errors,
+            );
+        });
+}
+
+export default { create, findById, update, signIn };

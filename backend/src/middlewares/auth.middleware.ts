@@ -1,7 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { JwtPayload } from 'jsonwebtoken';
 import knex from '../database/db';
-import { Payload } from '../interfaces/jwt.interface';
 
 import jwt from '../utils/jwt.util';
 import { encrypt } from '../utils/password.util';

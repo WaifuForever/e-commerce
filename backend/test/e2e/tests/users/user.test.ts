@@ -65,7 +65,7 @@ describe('Session createUser', () => {
         await supertest(app)
             .get('/auth')
             .auth(fake_user.email, user.password)
-            .expect(401)
+            .expect(400)
             .then(response => {
                 // Check type and length
                 expect(
@@ -75,10 +75,10 @@ describe('Session createUser', () => {
                 ).toBeTruthy();
                 console.log(response.body);
                 expect(response.body).toEqual({
-                    message: getMessage('default.unauthorized'),
+                    message: getMessage('default.badRequest'),
                     data: null,
-                    metadata: {},
-                    status: 401,
+                    metadata: ['email must be a valid email'],
+                    status: 400,
                 });
             });
     });
@@ -87,7 +87,7 @@ describe('Session createUser', () => {
         await supertest(app)
             .get('/auth')
             .auth(fake_user.email, fake_user.password)
-            .expect(401)
+            .expect(400)
             .then(response => {
                 // Check type and length
                 expect(
@@ -97,10 +97,12 @@ describe('Session createUser', () => {
                 ).toBeTruthy();
 
                 expect(response.body).toEqual({
-                    message: getMessage('default.unauthorized'),
+                    message: getMessage('default.badRequest'),
                     data: null,
-                    metadata: {},
-                    status: 401,
+                    metadata: [
+                        'the password must contain at least 1 number, at least 1 lower case letter, at least 1 upper case and at least 1 special character.',
+                    ],
+                    status: 400,
                 });
             });
     });
