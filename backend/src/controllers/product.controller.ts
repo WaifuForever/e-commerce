@@ -1,31 +1,34 @@
 import { Request, Response } from 'express';
 import { randomUUID } from 'crypto';
 
+
 import knex from '../database/db';
-import { IFindOne, IUser } from '../interfaces/user.interface';
+import { IFindOne, IProduct } from '../interfaces/product.interface';
 import { getMessage } from '../utils/message.util';
-import { hashPassword } from '../utils/password.util';
 
 const selection: IFindOne = {
     _id: '_id',
     name: 'name',
-    email: 'email',
+    description: 'description',
+    price: 'price',
 };
 
 async function create(req: Request, res: Response) {
     try {
-        const { name, email, password }: IUser = req.body;
+        const { name, description, price }: IProduct = req.body;
 
-        const result = await knex('users').insert({
+        console.log(req.auth)
+        const result = await knex('products').insert({
             _id: randomUUID(),
             name: name,
-            email: email,
-            password: await hashPassword(password),
+            description: description,
+            price: price,
+            user_id: req.auth
         });
-
+        req.auth = '';
         return res.jsonOK(
-            { name: name, email: email },
-            getMessage('user.valid.sign_up.success'),
+            req.body,
+            getMessage('product.create.success'),
             {},
         );
     } catch (error) {
@@ -37,10 +40,10 @@ async function create(req: Request, res: Response) {
 async function findOne(req: Request, res: Response) {
     const { _id } = req.query;
     try {
-        const user: Array<IFindOne> = await knex('users')
+        const product: Array<IFindOne> = await knex('products')
             .where('_id', _id?.toString())
             .select(selection);
-        return res.jsonOK(user[0], null, {});
+        return res.jsonOK(product[0], getMessage('product.findOne.success'), {});
     } catch (err) {
         console.log(err);
         return res.jsonBadRequest({ err: err }, null, null);
@@ -49,11 +52,13 @@ async function findOne(req: Request, res: Response) {
 
 async function list(req: Request, res: Response) {
     try {
-        const users: Array<IFindOne> = await knex('users').select(selection);
+        const products: Array<IFindOne> = await knex('products').select(
+            selection,
+        );
 
         return res.jsonOK(
-            users,
-            getMessage('user.list.success') + users.length,
+            products,
+            getMessage('product.list.success') + products.length,
             {},
         );
     } catch (err) {
@@ -63,13 +68,13 @@ async function list(req: Request, res: Response) {
 }
 
 async function update(req: Request, res: Response) {
-    const { _id, name } = req.body;
-
+    const { _id } = req.body;
+    delete req.body._id;
     try {
-        const result = await knex('users').where('_id', _id).update({
-            name: name,
-        });
-        return res.jsonOK(result, null, {});
+        const result = await knex('products')
+            .where('_id', _id)
+            .update(req.body);
+        return res.jsonOK(result, getMessage('product.update.success'), {});
     } catch (err) {
         console.log(err);
         return res.jsonBadRequest({ err: err }, null, null);
@@ -80,7 +85,7 @@ async function remove(req: Request, res: Response) {
     const { _id } = req.query;
 
     try {
-        await knex('users').where('_id', _id?.toString()).delete();
+        await knex('products').where('_id', _id?.toString()).delete();
         return res.jsonOK(null, null, {});
     } catch (err) {
         console.log(err);

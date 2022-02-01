@@ -16,6 +16,7 @@ export const auth = () => {
             try {
                 payload = jwt.verifyJwt(token, 1);
             } catch (err) {
+                console.log(err)
                 //Invalid Token
                 return res.jsonUnauthorized(err, null, null);
             }
@@ -27,6 +28,7 @@ export const auth = () => {
                 knex('users')
                     .where('_id', payload._id?.toString())
                     .then(result => {
+                        req.auth = encrypt(payload._id);
                         let current_time = Date.now().valueOf() / 1000;
                         if (
                             (payload.exp - payload.iat) / 2 >
@@ -54,6 +56,7 @@ export const auth = () => {
                     });
             }
         } catch (err) {
+            console.log(err)
             return res.jsonUnauthorized(null, null, null);
         }
     };

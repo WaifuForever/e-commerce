@@ -15,11 +15,11 @@ export const matchPassword = async (
     return await bcrypt.compare(password, supposedPassword);
 };
 
-export const encrypt = (val: string) => {
+export const encrypt = (val: string) => {    
     let cipher = createCipheriv(
         `${process.env.ALGORITHM}`,
-        `${process.env.ENC_KEY}`,
-        `${process.env.IV}`,
+        Buffer.from(`${process.env.ENC_KEY}`, "hex"),
+        Buffer.from(`${process.env.IV}`, "hex")
     );
     let encrypted = cipher.update(val, 'utf8', 'base64');
     encrypted += cipher.final('base64');
@@ -29,8 +29,8 @@ export const encrypt = (val: string) => {
 export const decrypt = (encrypted: string) => {
     let decipher = createDecipheriv(
         `${process.env.ALGORITHM}`,
-        `${process.env.ENC_KEY}`,
-        `${process.env.IV}`,
+        Buffer.from(`${process.env.ENC_KEY}`, "hex"),
+        Buffer.from(`${process.env.IV}`, "hex")
     );
     let decrypted = decipher.update(encrypted, 'base64', 'utf8');
     return decrypted + decipher.final('utf8');
