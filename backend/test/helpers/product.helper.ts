@@ -29,6 +29,7 @@ const createProduct = (payload: any, token: string | null) => {
                         !Array.isArray(response.body) &&
                         response.body !== null,
                 ).toBeTruthy();
+                console.log(response.body)
                 payload._id = response.body.data._id;
                 expect(response.body).toEqual({
                     message: getMessage('product.create.success'),

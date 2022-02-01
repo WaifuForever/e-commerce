@@ -2,14 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 import * as yup from 'yup';
 import { IUser } from '../interfaces/user.interface';
 import { getMessage } from '../utils/message.util';
-import { user_rules as rules } from '../utils/yup.util';
+import { product_rules as rules } from '../utils/yup.util';
 import { LooseObject } from '../interfaces/yup.interface';
 
 async function create(req: Request, res: Response, next: NextFunction) {
     const yupObject = yup.object().shape({
-        email: rules.email.required(),
         name: rules.name.required(),
-        password: rules.password.required(),
+        description: rules.description.required(),
+        price: rules.price.required(),
     });
 
     yupObject
@@ -75,32 +75,4 @@ async function update(req: Request, res: Response, next: NextFunction) {
         });
 }
 
-async function signIn(req: Request, res: Response, next: NextFunction) {
-    const [hashType, hash] = req.headers.authorization
-        ? req.headers.authorization.split(' ')
-        : [''];
-
-    if (hashType !== 'Basic') {
-        return res.jsonUnauthorized(null, null, null);
-    }
-
-    const [email, password] = Buffer.from(hash, 'base64').toString().split(':');
-
-    const yupObject = yup.object().shape({
-        email: rules.email.required(),
-        password: rules.password.required(),
-    });
-
-    yupObject
-        .validate({ email: email, password: password }, { stripUnknown: true })
-        .then(() => next())
-        .catch((err: any) => {
-            return res.jsonBadRequest(
-                null,
-                getMessage('default.badRequest'),
-                err.errors,
-            );
-        });
-}
-
-export default { create, findById, update, signIn };
+export default { create, findById, update };

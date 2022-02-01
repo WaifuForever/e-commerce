@@ -22,7 +22,7 @@ describe('Products', () => {
 
     createProduct(product, mockToken);
 
-    itif (false) ('GET /products', async () => {
+    it ('GET /products', async () => {
         await supertest(app)
             .get('/products')
             .send({})
