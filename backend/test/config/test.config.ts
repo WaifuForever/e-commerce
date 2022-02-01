@@ -1,13 +1,17 @@
 import fs from 'fs';
 import path from 'path';
 import knex from '../../src/database/db';
-import {
-    up,
-    down,
-} from '../../src/database/migrations/20220129190225_create_table_users';
+import { up as setUsers } from '../../src/database/migrations/20220129190225_create_table_users';
+import { up as setProducts } from '../../src/database/migrations/20220129190225_create_table_users';
 
 async function dropAllCollections() {
-    await down(knex);
+    knex.schema.dropTable('products');
+    knex.schema.dropTable('users');
+}
+
+async function deleteAllData() {
+    await knex('products').del();
+    await knex('users').del();
 }
 
 async function dropTestUploadFolder() {
@@ -21,12 +25,16 @@ function setupDB() {
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir);
         }
-        await up(knex);
+        const hasUsers = await knex.schema.hasTable('users');
+        const hasProducts = await knex.schema.hasTable('products');
+        if (!hasUsers) await setUsers(knex);
+        if (!hasProducts) await setProducts(knex);
     });
 
     // Disconnect Mongoose
     afterAll(async () => {
-        await dropAllCollections();
+        await deleteAllData();
+        //await dropAllCollections();
         await dropTestUploadFolder();
     });
 }
