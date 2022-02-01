@@ -2,6 +2,8 @@ export interface IProduct {
     name: string;
     price: number;
     description: string;   
+    _id?: string;
+    user_id?: string;
 }
 
 export interface IFindOne {

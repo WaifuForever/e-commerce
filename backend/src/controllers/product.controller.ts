@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { randomUUID } from 'crypto';
 
-
 import knex from '../database/db';
 import { IFindOne, IProduct } from '../interfaces/product.interface';
 import { getMessage } from '../utils/message.util';
+import { decrypt } from '../utils/password.util';
 
 const selection: IFindOne = {
     _id: '_id',
@@ -15,22 +15,18 @@ const selection: IFindOne = {
 
 async function create(req: Request, res: Response) {
     try {
-        const { name, description, price }: IProduct = req.body;
-
-        console.log(req.auth)
-        const result = await knex('products').insert({
+        const product: IProduct = {
             _id: randomUUID(),
-            name: name,
-            description: description,
-            price: price,
-            user_id: req.auth
-        });
-        req.auth = '';
-        return res.jsonOK(
-            req.body,
-            getMessage('product.create.success'),
-            {},
-        );
+            name: req.body.name as string,
+            description: req.body.description as string,
+            price: req.body.price as number,
+            user_id: decrypt(req.auth!),
+        };
+
+        await knex('products').insert(product);
+        delete product.user_id;
+
+        return res.jsonOK(product, getMessage('product.create.success'), {});
     } catch (error) {
         console.log(error);
         return res.jsonBadRequest(error, null, null);
@@ -39,11 +35,17 @@ async function create(req: Request, res: Response) {
 
 async function findOne(req: Request, res: Response) {
     const { _id } = req.query;
+
     try {
         const product: Array<IFindOne> = await knex('products')
-            .where('_id', _id?.toString())
+            .where({ _id: _id?.toString() })
             .select(selection);
-        return res.jsonOK(product[0], getMessage('product.findOne.success'), {});
+        console.log(product);
+        return res.jsonOK(
+            product[0],
+            getMessage('product.findOne.success'),
+            {},
+        );
     } catch (err) {
         console.log(err);
         return res.jsonBadRequest({ err: err }, null, null);
