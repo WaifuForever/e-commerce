@@ -50,7 +50,6 @@
         "jsonwebtoken": "^8.5.1",
         "knex": "^1.0.1",
         "pg": "^8.7.1",
-        "uuid": "^8.3.2",
         "yup": "^0.32.11"
     },
     "devDependencies": {
