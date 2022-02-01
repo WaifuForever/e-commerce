@@ -50,7 +50,12 @@ First things first you need to get the docker running, use the following command
 $ yarn dc:up
 
 ```
-With the docker ok, you're ready to start the application
+Then run migrations on the database
+```bash
+$ yarn migrate:latest:test
+
+```
+With the docker and migrations ok, you're ready to start the application
 ```bash
 # development
 $ yarn start:dev
@@ -62,7 +67,12 @@ To run the tests we also need the docker running, use the following command
 $ yarn dc:up
 
 ```
-With the docker ready, then you run the tests
+Then run migrations on the database
+```bash
+$ yarn migrate:latest:test
+
+```
+With the docker and migrations ready, then you run the tests
 ```bash
 # all tests
 yarn test
