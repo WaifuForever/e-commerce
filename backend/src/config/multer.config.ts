@@ -6,21 +6,22 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { decrypt } from '../utils/password.util';
 
-type DestinationCallback = (error: Error | null, destination: string) => void
-type FileNameCallback = (error: Error | null, filename: string) => void
-
+type DestinationCallback = (error: Error | null, destination: string) => void;
+type FileNameCallback = (error: Error | null, filename: string) => void;
 
 export const folderName =
     process.env.NODE_ENV === 'dev' ? 'uploads/' : 'uploads2/';
 
 export const files = {
     storage: multer.diskStorage({
-        destination: (req: Request, files: Express.Multer.File, cb: DestinationCallback) => {
-            let user_id = decrypt(req.auth!);
+        destination: (
+            req: Request,
+            file: Express.Multer.File,
+            cb: DestinationCallback,
+        ) => {
+            cb(null, path.resolve(__dirname, '..', '..', folderName));
 
-            cb(null, path.resolve(__dirname, '..', '..', folderName, user_id));
-
-            let dir = './' + folderName + user_id + '/';
+            let dir = './' + folderName;
             if (!fs.existsSync(dir)) return false;
             //fs.mkdirSync(dir);
 
@@ -28,7 +29,7 @@ export const files = {
         },
         filename: (
             req: Request,
-            file,
+            file: Express.Multer.File,
             cb: FileNameCallback,
         ) => {
             randomBytes(16, (err, hash) => {
@@ -43,7 +44,11 @@ export const files = {
     limits: {
         fileSize: 3 * 1024 * 1024,
     },
-    fileFilter: (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+    fileFilter: (
+        req: Request,
+        file: Express.Multer.File,
+        cb: multer.FileFilterCallback,
+    ) => {
         const allowedMimes = ['image/png', 'image/jpeg', 'image/jpg'];
         if (allowedMimes.includes(file.mimetype)) {
             cb(null, true);

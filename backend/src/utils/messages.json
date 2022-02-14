@@ -15,5 +15,6 @@
     "product.create.success": "Product created!",
     "product.findOne.success": "Product retrieved successfuly!",
     "product.list.success": "Product list retrieved successfully! Products found: ",
-    "product.update.success": "Product updated."
+    "product.update.success": "Product updated.",
+    "image.store.success": "Successful request! Images uploaded: "
 }
