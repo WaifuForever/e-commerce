@@ -1,7 +1,10 @@
 import { Knex } from 'knex';
 
+const table = 'users';
+
 export async function up(knex: Knex): Promise<void> {
-    return knex.schema.createTable('users', (table: Knex.TableBuilder) => {
+    await knex.raw(`DROP TABLE IF EXISTS "${table}" CASCADE`);
+    return knex.schema.createTable(table, (table: Knex.TableBuilder) => {
         table.uuid('_id').primary().notNullable().unique();
         table.string('email').notNullable().unique();
         table.string('password').notNullable();
@@ -12,5 +15,5 @@ export async function up(knex: Knex): Promise<void> {
 }
 
 export async function down(knex: Knex): Promise<void> {
-    return knex.schema.dropTable('users');
+    return knex.schema.dropTableIfExists(table);
 }
