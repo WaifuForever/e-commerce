@@ -4,14 +4,17 @@ import knex from '../../src/database/db';
 import { up as setUsers } from '../../src/database/migrations/20220129190225_create_table_users';
 import { up as setProducts } from '../../src/database/migrations/20220129190225_create_table_users';
 
-async function dropAllCollections() {
-    knex.schema.dropTable('products');
+async function dropAllCollections() {   
+    knex.schema.dropTable('images');
+    knex.schema.dropTable('products');   
     knex.schema.dropTable('users');
 }
 
 async function deleteAllData() {
+    await knex('images').del();
     await knex('products').del();
     await knex('users').del();
+
 }
 
 async function dropTestUploadFolder() {
